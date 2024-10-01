@@ -1,0 +1,31 @@
+services:
+  ui:
+    container_name: ui
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    user: 1000:1000
+    stdin_open: true
+    tty: true
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/app
+    command: sh -c "yarn install && yarn run dev"
+
+  storybook:
+    container_name: storybook
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    user: 1000:1000
+    init: true
+    stdin_open: true
+    tty: true
+    ports:
+      - "6006:6006"
+    depends_on:
+      - ui
+    volumes:
+      - .:/app
+    command: sh -c "yarn run storybook --ci"
