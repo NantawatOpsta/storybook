@@ -3,25 +3,31 @@ import Navigation from "../(components)/navigation/navigation";
 import Title from "../(components)/title/title";
 import Card from "../(components)/card/card";
 
-export default function Dashboard() {
-  let navigationList = [
-    {
-      id: "1",
-      title: "Overview",
-      url: "#",
-    },
-    {
-      id: "2",
-      title: "Pricing",
-      url: "#",
-    },
-    {
-      id: "3",
-      title: "Marketplace",
-      url: "#",
-    },
-  ];
+import useSWR from "swr";
 
+export default function Dashboard() {
+  return (
+    <>
+      <NavigationRender />
+      <Title title="Overview" />
+      <CardRender />
+    </>
+  );
+}
+
+function NavigationRender() {
+  const fetcher = (url) => fetch(url).then((res) => res.json());
+  const { data, error } = useSWR("/api/navigation", fetcher);
+
+  if (error) return <div>failed to load</div>;
+  if (!data) return <div>loading...</div>;
+
+  const navigationList = data;
+
+  return <Navigation navigationList={navigationList} />;
+}
+
+function CardRender() {
   let cardList = [
     <div>1</div>,
     <div>2</div>,
@@ -30,14 +36,9 @@ export default function Dashboard() {
     <div>5</div>,
     <div>6</div>,
   ];
-
   return (
-    <div>
-      <Navigation navigationList={navigationList} />
-      <Title title="Overview" />
-      <div className="grid grid-cols-3 gap-4 mt-6">
-        {cardList && cardList.map((item) => <Card key={item.id}>{item}</Card>)}
-      </div>
+    <div className="grid grid-cols-3 gap-4 mt-6">
+      {cardList && cardList.map((item) => <Card key={item.id}>{item}</Card>)}
     </div>
   );
 }
